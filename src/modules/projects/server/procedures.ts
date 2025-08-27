@@ -9,6 +9,24 @@ import { inngest } from "@/inngest/client";
 
 
 export const projectsRouter = createTRPCRouter({
+  getOne:baseProcedure
+  .input(
+    z.object({
+      id: z.string().min(1,{message:"Project id is required"}),
+    })
+  )
+  
+  .query(async ({input})=>{
+    const existingProject=await prisma.project.findUnique({
+        where:{
+            id:input.id,
+        },
+    });
+    if(!existingProject){
+      throw new Error("Project not found");
+    }
+    return existingProject;
+}),
     getMany:baseProcedure.query(async ()=>{
         const projects=await prisma.project.findMany({
             orderBy:{

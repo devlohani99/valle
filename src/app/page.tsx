@@ -5,37 +5,40 @@ import { useMutation } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 const Page = () => {
-  const router=useRouter();
-
-  const [value,setValue]=useState("");
+  const router = useRouter();
+  const [value, setValue] = useState("");
 
   const trpc = useTRPC();
- 
 
   const createProject = useMutation(
     trpc.projects.create.mutationOptions({
-      onError:()=>{
+      onError: () => {
         toast.error("Something went wrong");
       },
-      onSuccess:(data)=>{
+      onSuccess: (data) => {
         router.push(`/projects/${data.id}`);
       }
-      
     })
   );
 
   return (
     <div className="h-screen w-screen flex items-center justify-center">
       <div className="max-w-7xl mx-auto flex items-center flex-col gap-y-4 justify-center">
-      <Input value={value} onChange={(e) => setValue(e.target.value)} />
-      <Button disabled={createProject.isPending} onClick={() => createProject.mutate({ value: value })}>
-        Submit
-      </Button>
+        <Input 
+          value={value} 
+          onChange={(e) => setValue(e.target.value)} 
+          placeholder="Enter project name"
+        />
+        <Button 
+          disabled={createProject.isPending} 
+          onClick={() => createProject.mutate({ value: value })}
+        >
+          {createProject.isPending ? "Creating..." : "Create Project"}
+        </Button>
       </div>
-
     </div>
   );
 };
